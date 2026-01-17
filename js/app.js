@@ -58,6 +58,27 @@ const CodenourApp = (() => {
         extractPreview(markdown) {
             const lines = markdown.split('\n');
             return lines.find(line => line.trim() && !line.startsWith('#')) || '';
+        },
+
+        // Check if markdown library is loaded
+        checkMarkdownLibrary() {
+            if (typeof marked === 'undefined') {
+                throw new Error('Marked library failed to load');
+            }
+        },
+
+        // Fetch markdown file
+        async fetchMarkdown(path) {
+            const response = await fetch(path);
+            if (!response.ok) throw new Error(`Failed to load ${path}`);
+            return response.text();
+        },
+
+        // Fetch JSON file
+        async fetchJson(path) {
+            const response = await fetch(path);
+            if (!response.ok) throw new Error(`Failed to load ${path}`);
+            return response.json();
         }
     };
 
@@ -68,8 +89,8 @@ const CodenourApp = (() => {
             if (!container) return;
 
             try {
-                await this.checkMarkdownLibrary();
-                const newsList = await this.fetchNewsList();
+                utils.checkMarkdownLibrary();
+                const newsList = await utils.fetchJson('news/index.json');
                 await this.renderNews(container, newsList);
             } catch (error) {
                 console.error('Error initializing news:', error);
@@ -77,22 +98,9 @@ const CodenourApp = (() => {
             }
         },
 
-        async checkMarkdownLibrary() {
-            if (typeof marked === 'undefined') {
-                throw new Error('Marked library failed to load');
-            }
-        },
-
-        async fetchNewsList() {
-            const response = await fetch('news/index.json');
-            if (!response.ok) throw new Error('Failed to load news index');
-            return response.json();
-        },
-
         async renderNews(container, newsList) {
-            container.innerHTML = ''; // Clear loading spinner
+            container.innerHTML = '';
 
-            // Load all news in parallel for better performance
             const newsPromises = newsList.map(newsItem =>
                 this.renderNewsItem(container, newsItem)
             );
@@ -102,7 +110,7 @@ const CodenourApp = (() => {
 
         async renderNewsItem(container, newsItem) {
             try {
-                const markdown = await this.fetchMarkdown(`news/${newsItem.file}`);
+                const markdown = await utils.fetchMarkdown(`news/${newsItem.file}`);
                 const card = utils.createElement('div', { class: 'card' }, `
                     <div class="card-content">
                         <span class="card-tag">${utils.escapeHtml(newsItem.date)}</span>
@@ -121,12 +129,6 @@ const CodenourApp = (() => {
                 `);
                 container.appendChild(errorCard);
             }
-        },
-
-        async fetchMarkdown(path) {
-            const response = await fetch(path);
-            if (!response.ok) throw new Error(`Failed to load ${path}`);
-            return response.text();
         }
     };
 
@@ -137,8 +139,8 @@ const CodenourApp = (() => {
             if (!container) return;
 
             try {
-                await this.checkMarkdownLibrary();
-                const gamesList = await this.fetchGamesList();
+                utils.checkMarkdownLibrary();
+                const gamesList = await utils.fetchJson('games/index.json');
                 await this.renderGames(container, gamesList);
             } catch (error) {
                 console.error('Error initializing games:', error);
@@ -146,20 +148,8 @@ const CodenourApp = (() => {
             }
         },
 
-        async checkMarkdownLibrary() {
-            if (typeof marked === 'undefined') {
-                throw new Error('Marked library failed to load');
-            }
-        },
-
-        async fetchGamesList() {
-            const response = await fetch('games/index.json');
-            if (!response.ok) throw new Error('Failed to load games index');
-            return response.json();
-        },
-
         async renderGames(container, gamesList) {
-            container.innerHTML = ''; // Clear loading spinner
+            container.innerHTML = '';
 
             gamesList.forEach(game => {
                 const card = this.createGameCard(game);
@@ -184,7 +174,7 @@ const CodenourApp = (() => {
 
         async loadGamePreview(game) {
             try {
-                const markdown = await this.fetchMarkdown(`games/${game.file}`);
+                const markdown = await utils.fetchMarkdown(`games/${game.file}`);
                 const preview = utils.extractPreview(markdown);
                 const previewEl = document.getElementById(`${game.id}-preview`);
                 if (previewEl) {
@@ -195,15 +185,9 @@ const CodenourApp = (() => {
             }
         },
 
-        async fetchMarkdown(path) {
-            const response = await fetch(path);
-            if (!response.ok) throw new Error(`Failed to load ${path}`);
-            return response.text();
-        },
-
         async showGameDetails(file) {
             try {
-                const markdown = await this.fetchMarkdown(`games/${file}`);
+                const markdown = await utils.fetchMarkdown(`games/${file}`);
                 this.openModal(marked.parse(markdown));
             } catch (error) {
                 console.error('Error loading game details:', error);
