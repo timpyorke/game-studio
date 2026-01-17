@@ -20,16 +20,17 @@ CODENOUR is an indie game studio website dedicated to bringing back the golden a
 Game Studio/
 ├── index.html      # Home page with hero section and latest project
 ├── games.html      # Games catalog page (dynamically loaded)
+├── news.html       # News and changelog page (dynamically loaded)
+├── about.html      # About the studio page
+├── css/            # Stylesheets
+│   └── style.css   # Main stylesheet
+├── js/             # JavaScript files (for future use)
 ├── games/          # Game content folder
 │   ├── index.json  # Game list metadata
 │   └── *.md        # Individual game pages in markdown
-├── news.html       # News and changelog page (dynamically loaded)
 ├── news/           # News content folder
 │   ├── index.json  # News list metadata
 │   └── *.md        # Individual news posts in markdown
-├── about.html      # About the studio page
-├── style.css       # Main stylesheet with all styling
-├── script.js       # JavaScript for interactivity
 └── README.md       # This file
 ```
 
