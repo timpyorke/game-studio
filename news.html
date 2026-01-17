@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODENOUR | News</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="index.html" class="nav-logo"><i class="fas fa-gamepad"></i> CODENOUR</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="games.html">Games</a></li>
+                <li><a href="news.html" style="color:var(--accent-color)">News</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+        </nav>
+        
+        <h2 class="section-title">NEWS & UPDATES</h2>
+        
+        <div id="news-container" class="grid-container" style="grid-template-columns: 1fr;">
+            <!-- News items will be loaded here -->
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+            </div>
+            <p>&copy; 2026 CODENOUR. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        // Check if marked is loaded
+        if (typeof marked === 'undefined') {
+            console.error('Marked library failed to load');
+        }
+        
+        // Load news list
+        fetch('news/index.json')
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load news index');
+                return response.json();
+            })
+            .then(newsList => {
+                const container = document.getElementById('news-container');
+                
+                // Load each markdown file
+                newsList.forEach(newsItem => {
+                    fetch(`news/${newsItem.file}`)
+                        .then(response => {
+                            if (!response.ok) throw new Error(`Failed to load ${newsItem.file}`);
+                            return response.text();
+                        })
+                        .then(markdown => {
+                            const card = document.createElement('div');
+                            card.className = 'card';
+                            
+                            const contentHtml = `
+                                <div class="card-content">
+                                    <span class="card-tag">${newsItem.date}</span>
+                                    <div class="markdown-content">
+                                        ${marked.parse(markdown)}
+                                    </div>
+                                </div>
+                            `;
+                            
+                            card.innerHTML = contentHtml;
+                            container.appendChild(card);
+                        })
+                        .catch(error => {
+                            console.error('Error loading markdown:', error);
+                            const errorCard = document.createElement('div');
+                            errorCard.className = 'card';
+                            errorCard.innerHTML = `
+                                <div class="card-content">
+                                    <p style="color: #ff4444;">Error loading ${newsItem.file}</p>
+                                </div>
+                            `;
+                            container.appendChild(errorCard);
+                        });
+                });
+            })
+            .catch(error => {
+                console.error('Error loading news:', error);
+                const container = document.getElementById('news-container');
+                container.innerHTML = `
+                    <div class="card">
+                        <div class="card-content">
+                            <h3 style="color: #ff4444;">⚠️ Unable to Load News</h3>
+                            <p style="color: var(--secondary-text);">
+                                Please run a local web server to view this page.<br><br>
+                                <strong>Quick start:</strong><br>
+                                1. Open Terminal in this folder<br>
+                                2. Run: <code>python -m http.server 8000</code><br>
+                                3. Open: <code>http://localhost:8000</code>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            });
+    </script>
+
+    <style>
+        .markdown-content h2 {
+            color: var(--primary-text);
+            margin-top: 0;
+        }
+        .markdown-content h3 {
+            color: var(--accent-color);
+            margin-top: 20px;
+        }
+        .markdown-content ul {
+            color: var(--secondary-text);
+            margin: 10px 0 10px 20px;
+        }
+        .markdown-content p {
+            color: var(--secondary-text);
+            margin: 15px 0;
+        }
+    </style>
+</body>
+</html>
