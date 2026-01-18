@@ -136,15 +136,55 @@ const CodenourApp = (() => {
     const GamesModule = {
         async init() {
             const container = document.getElementById('games-container');
-            if (!container) return;
+            const latestContainer = document.getElementById('latest-project-container');
 
             try {
                 utils.checkMarkdownLibrary();
                 const gamesList = await utils.fetchJson('games/index.json');
-                await this.renderGames(container, gamesList);
+
+                // Load latest project if on homepage
+                if (latestContainer && gamesList.length > 0) {
+                    await this.renderLatestProject(latestContainer, gamesList[0]);
+                }
+
+                // Load games list
+                if (container) {
+                    await this.renderGames(container, gamesList);
+                }
             } catch (error) {
                 console.error('Error initializing games:', error);
-                utils.showError(container, 'Unable to Load Games', CONFIG.errorMessages.server);
+                if (container) {
+                    utils.showError(container, 'Unable to Load Games', CONFIG.errorMessages.server);
+                }
+                if (latestContainer) {
+                    utils.showError(latestContainer, 'Unable to Load Latest Project', CONFIG.errorMessages.server);
+                }
+            }
+        },
+
+        async renderLatestProject(container, game) {
+            try {
+                const markdown = await utils.fetchMarkdown(`games/${game.file}`);
+                const preview = utils.extractPreview(markdown);
+
+                container.innerHTML = `
+                    <div class="card" style="grid-column: 1 / -1; display: flex; flex-wrap: wrap;">
+                        <div class="card-img" style="flex: 1; min-width: 300px; height: auto;">
+                            <img src="${utils.escapeHtml(game.image)}" alt="${utils.escapeHtml(game.title)}">
+                        </div>
+                        <div class="card-content" style="flex: 1;">
+                            <span class="card-tag" style="${game.statusStyle || ''}">${utils.escapeHtml(game.status)}</span>
+                            <h3 style="margin: 15px 0;">${utils.escapeHtml(game.title)}</h3>
+                            <p style="margin-bottom: 20px; color: var(--secondary-text);">
+                                ${utils.escapeHtml(preview)}
+                            </p>
+                            <button class="btn" data-game-file="${game.file}">VIEW DETAILS</button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading latest project:', error);
+                utils.showError(container, 'Unable to Load Latest Project', CONFIG.errorMessages.server);
             }
         },
 

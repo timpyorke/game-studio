@@ -1,26 +1,10 @@
 [
     {
-        "id": "starlight-odyssey",
-        "title": "STARLIGHT ODYSSEY",
+        "id": "the-cozy-campfire",
+        "title": "THE COZY CAMPFIRE",
         "status": "COMING 2026",
         "statusStyle": "",
         "image": "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=500&q=80",
-        "file": "2-starlight-odyssey.md"
-    },
-    {
-        "id": "dungeon-delver",
-        "title": "DUNGEON DELVER",
-        "status": "RELEASED",
-        "statusStyle": "background:#2ecc71; color:#000;",
-        "image": "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=500&q=80",
-        "file": "1-dungeon-delver.md"
-    },
-    {
-        "id": "project-neon",
-        "title": "PROJECT: NEON",
-        "status": "PROTOTYPE",
-        "statusStyle": "background:#95a5a6; color:#000;",
-        "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=500&q=80",
-        "file": "3-project-neon.md"
+        "file": "the-cozy-campfire.md"
     }
 ]
